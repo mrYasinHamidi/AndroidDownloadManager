@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="CircleProgress">
+        <attr name="cp_min" format="integer"/>
+        <attr name="cp_max" format="integer"/>
+        <attr name="cp_progress" format="integer"/>
+        <attr name="cp_stroke_width" format="dimension"/>
+        <attr name="cp_color" format="color"/>
+        <attr name="cp_auto_colored" format="boolean"/>
+        <attr name="cp_show_percent" format="boolean"/>
+    </declare-styleable>
+
+</resources>

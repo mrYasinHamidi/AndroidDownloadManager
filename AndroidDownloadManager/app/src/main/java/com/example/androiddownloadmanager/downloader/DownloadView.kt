@@ -3,20 +3,20 @@ package com.example.androiddownloadmanager.downloader
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
-import android.view.View
 import android.widget.LinearLayout
-import android.widget.TextView
+import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import com.example.androiddownloadmanager.DownloadInfo
 import com.example.androiddownloadmanager.DownloadState
 import com.example.androiddownloadmanager.R
 import com.example.androiddownloadmanager.databinding.DownloadViewBinding
-import com.example.androiddownloadmanager.utility.format
 import com.example.androiddownloadmanager.utility.getSize
+import com.example.androiddownloadmanager.utility.OnStateChange
 import java.io.File
 
 class DownloadView : LinearLayout {
 
+    private val onChangeListeners = ArrayList<OnStateChange>()
 
     constructor(context: Context?) : super(context)
     constructor(context: Context?, attrs: AttributeSet?) : super(
@@ -76,14 +76,26 @@ class DownloadView : LinearLayout {
     }
 
     private fun download() {
-
+        Toast.makeText(context, "${info?.name} is downloading ...", Toast.LENGTH_SHORT).show()
     }
 
     fun stop() {
         info?.let {
-            it.state = DownloadState.STOP
+            updateState(DownloadState.STOP)
         }
     }
 
+    private fun updateState(state: DownloadState) {
+        info?.let {
+            it.state = state
+            for (i in onChangeListeners)
+                i.onUpdate(state)
+        }
+    }
+
+
+    fun setOnStateChangeListener(onChange: OnStateChange){
+        onChangeListeners.add(onChange)
+    }
 
 }

@@ -10,6 +10,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.example.androiddownloadmanager.R
 import com.example.androiddownloadmanager.databinding.RequestFragmentBinding
 import com.example.androiddownloadmanager.utility.ChangeText
@@ -61,12 +62,12 @@ class RequestFragment : DialogFragment() {
         }
 
         //when user change add or remove a latter from link
-        binding.inputUrl.addOnChangeTextListener(object:ChangeText{
-            override fun onUpdate() {
-                Toast.makeText(context, "textChange", Toast.LENGTH_SHORT).show()
-                viewModel.clareStatus()
-            }
-        })
+//        binding.inputUrl.addOnChangeTextListener(object:ChangeText{
+//            override fun onUpdate() {
+//                Toast.makeText(context, "textChange", Toast.LENGTH_SHORT).show()
+//                viewModel.clareStatus()
+//            }
+//        })
 
 
         //set onClick for button start and cancel
@@ -118,16 +119,26 @@ class RequestFragment : DialogFragment() {
     }
 
     private fun submit() {
-        findNavController().previousBackStackEntry?.savedStateHandle?.set(
-            "request",
-            mapOf<String, String>(
-                Pair("name", "${viewModel.name.value}"),
-                Pair("url", binding.inputUrl.text.toString()),
-                Pair("size", "${viewModel.size.value}"),
-                Pair("path", "${viewModel.path.value}")
+        val args: RequestFragmentArgs by navArgs()
+        val name =
+            if (binding.inputName.text.isEmpty()) "${viewModel.name.value}" else "${binding.inputName.text.toString()
+                .trim()}.${binding.inputUrl.text.toString().split(".").last()}"
+        if (args.names.contains(name)) {
+            Toast.makeText(context, "this name is already used", Toast.LENGTH_SHORT).show()
+        } else {
+            findNavController().previousBackStackEntry?.savedStateHandle?.set(
+                "request",
+                mapOf<String, String>(
+                    Pair(
+                        "name", name
+                    ),
+                    Pair("url", binding.inputUrl.text.toString()),
+                    Pair("size", "${viewModel.size.value}"),
+                    Pair("path", "${viewModel.path.value}")
+                )
             )
-        )
-        findNavController().navigateUp()
+            findNavController().navigateUp()
+        }
     }
 
 }

@@ -19,7 +19,7 @@ class DownloadFragment : Fragment() {
 
     private lateinit var binding: DownloadFragmentBinding
     private lateinit var viewModel: DownloadViewModel
-
+    private lateinit var adapter: DownloadAdapter
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -33,9 +33,15 @@ class DownloadFragment : Fragment() {
         //initialize view model
         viewModel = createViewModel()
 
+        //setup recycler view
+        adapter = DownloadAdapter()
+        binding.recyclerView.adapter = adapter
+
         //set an on click listener for add button
         binding.addFloatingButton.setOnClickListener {
-            findNavController().navigate(R.id.action_downloadFragment_to_requestFragment)
+            val action =
+                DownloadFragmentDirections.actionDownloadFragmentToRequestFragment(viewModel.getNames())
+            findNavController().navigate(action)
         }
 
         return binding.root
@@ -57,15 +63,15 @@ class DownloadFragment : Fragment() {
                 Observer {
                     val view = DownloadView(context)
                     val info = DownloadInfo(
-                        it.get("name") ?: "",
-                        it.get("url") ?: "",
-                        it.get("path") ?: "",
-                        (it.get("size") ?: "").toLong(),
+                        it["name"] ?: "",
+                        it["url"] ?: "",
+                        it["path"] ?: "",
+                        (it["size"] ?: "").toLong(),
                         DownloadState.NONE
                     )
-                    binding.downloadList.addView(view)
-                    view.setDownloadInformation(info)
-
+                    viewModel.addDownloadInfo(info) {
+                        adapter.submitList(it)
+                    }
                 })
     }
 

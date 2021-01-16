@@ -18,5 +18,9 @@
         android:id="@+id/requestFragment"
         android:name="com.example.androiddownloadmanager.request.RequestFragment"
         android:label="request_fragment"
-        tools:layout="@layout/request_fragment" />
+        tools:layout="@layout/request_fragment" >
+        <argument
+            android:name="names"
+            app:argType="string[]" />
+    </dialog>
 </navigation>

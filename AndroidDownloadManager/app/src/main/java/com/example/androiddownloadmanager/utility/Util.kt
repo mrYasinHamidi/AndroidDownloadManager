@@ -2,6 +2,7 @@ package com.example.androiddownloadmanager.utility
 
 import android.content.ClipboardManager
 import android.content.Context
+import com.example.androiddownloadmanager.DownloadState
 
 const val B = 1
 const val KB = B * 1024
@@ -18,6 +19,10 @@ interface TextPaste {
 
 interface ChangeText {
     fun onUpdate()
+}
+
+interface OnStateChange {
+    fun onUpdate(state: DownloadState)
 }
 
 fun getSize(size: Long): String {

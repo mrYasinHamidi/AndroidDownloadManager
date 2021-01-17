@@ -6,14 +6,17 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
-import com.example.androiddownloadmanager.DownloadInfo
+import com.example.androiddownloadmanager.database.DownloadInfo
 import com.example.androiddownloadmanager.DownloadState
 import com.example.androiddownloadmanager.R
+import com.example.androiddownloadmanager.database.DownloadDatabase
+import com.example.androiddownloadmanager.database.getDatabase
 import com.example.androiddownloadmanager.databinding.DownloadFragmentBinding
+import com.example.androiddownloadmanager.utility.getStateFromDb
+import com.example.androiddownloadmanager.utility.setStateToDb
 
 class DownloadFragment : Fragment() {
 
@@ -44,11 +47,18 @@ class DownloadFragment : Fragment() {
             findNavController().navigate(action)
         }
 
+        //get the list of download an show it in recycler view
+        viewModel.downloadList.observe(viewLifecycleOwner, Observer {
+            adapter.submitList(it)
+        })
+
         return binding.root
     }
 
     private fun createViewModel(): DownloadViewModel {
-        val vm = ViewModelProvider(this).get(DownloadViewModel::class.java)
+        val application = requireActivity().application
+        val factory = DownloadViewModelFactory(getDatabase(application).dao,application)
+        val vm = ViewModelProvider(this,factory).get(DownloadViewModel::class.java)
         binding.viewModel = vm
         binding.lifecycleOwner = this
         return vm
@@ -63,15 +73,13 @@ class DownloadFragment : Fragment() {
                 Observer {
                     val view = DownloadView(context)
                     val info = DownloadInfo(
-                        it["name"] ?: "",
-                        it["url"] ?: "",
-                        it["path"] ?: "",
-                        (it["size"] ?: "").toLong(),
-                        DownloadState.NONE
+                        name = it["name"] ?: "",
+                        url = it["url"] ?: "",
+                        path = it["path"] ?: "",
+                        size = (it["size"] ?: "").toLong(),
+                        state = setStateToDb(DownloadState.NONE)
                     )
-                    viewModel.addDownloadInfo(info) {
-                        adapter.submitList(it)
-                    }
+                    viewModel.addDownloadInfo(info)
                 })
     }
 

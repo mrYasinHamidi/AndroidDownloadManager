@@ -42,3 +42,21 @@ fun getSize(size: Long): String {
 
 fun Double.format(digits: Int) = "%.${digits}f".format(this)
 fun Float.format(digits: Int) = "%.${digits}f".format(this)
+
+fun getStateFromDb(state: Int) = when (state) {
+        0 -> DownloadState.NONE
+        1 -> DownloadState.RUNNING
+        2 -> DownloadState.SUCCESSFUL
+        3 -> DownloadState.ERROR
+        4 -> DownloadState.STOP
+        else -> DownloadState.NONE
+    }
+
+fun setStateToDb(state: DownloadState) = when(state){
+    DownloadState.NONE -> 0
+    DownloadState.RUNNING -> 1
+    DownloadState.SUCCESSFUL -> 2
+    DownloadState.ERROR -> 3
+    DownloadState.STOP -> 4
+    else -> 0
+}

@@ -1,15 +1,15 @@
 package com.example.androiddownloadmanager.downloader
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.example.androiddownloadmanager.DownloadInfo
+import com.example.androiddownloadmanager.database.DownloadInfo
 import com.example.androiddownloadmanager.DownloadState
 import com.example.androiddownloadmanager.databinding.DownloadListItemBinding
+import com.example.androiddownloadmanager.utility.getStateFromDb
+import com.example.androiddownloadmanager.utility.setStateToDb
 
 class DownloadAdapter : ListAdapter<DownloadInfo, DownloadViewHolder>(DownloadUtil()) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DownloadViewHolder {
@@ -27,7 +27,7 @@ class DownloadViewHolder(private val binding: DownloadListItemBinding) :
         binding.info = info
         binding.executePendingBindings()
         binding.downloadView.setDownloadInformation(info)
-        if (info.state == DownloadState.NONE)
+        if (getStateFromDb(info.state) == DownloadState.NONE)
             binding.downloadView.start()
 
 

@@ -6,12 +6,14 @@ import android.view.LayoutInflater
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
-import com.example.androiddownloadmanager.DownloadInfo
+import com.example.androiddownloadmanager.database.DownloadInfo
 import com.example.androiddownloadmanager.DownloadState
 import com.example.androiddownloadmanager.R
 import com.example.androiddownloadmanager.databinding.DownloadViewBinding
 import com.example.androiddownloadmanager.utility.getSize
 import com.example.androiddownloadmanager.utility.OnStateChange
+import com.example.androiddownloadmanager.utility.getStateFromDb
+import com.example.androiddownloadmanager.utility.setStateToDb
 import java.io.File
 
 class DownloadView : LinearLayout {
@@ -53,7 +55,7 @@ class DownloadView : LinearLayout {
             binding.dlTxtSize.text = getSize(it.size)
             binding.dlTxtSpeed.text = ""
             binding.dlTxtTime.text = ""
-            when (it.state) {
+            when (getStateFromDb(it.state)) {
                 DownloadState.STOP -> binding.circleProgress.progress =
                     (File(it.path).length() / it.size * 100).toInt()
                 DownloadState.ERROR -> binding.circleProgress.progress =
@@ -70,7 +72,7 @@ class DownloadView : LinearLayout {
 
     fun start() {
         info?.let {
-            it.state = DownloadState.RUNNING
+            it.state = setStateToDb(DownloadState.RUNNING)
             download()
         }
     }
@@ -87,7 +89,7 @@ class DownloadView : LinearLayout {
 
     private fun updateState(state: DownloadState) {
         info?.let {
-            it.state = state
+            it.state = setStateToDb(state)
             for (i in onChangeListeners)
                 i.onUpdate(state)
         }

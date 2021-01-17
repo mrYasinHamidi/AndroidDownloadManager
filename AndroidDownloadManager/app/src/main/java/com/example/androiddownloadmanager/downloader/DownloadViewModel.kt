@@ -1,29 +1,50 @@
 package com.example.androiddownloadmanager.downloader
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
-import com.example.androiddownloadmanager.DownloadInfo
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
+import com.example.androiddownloadmanager.database.DownloadDao
+import com.example.androiddownloadmanager.database.DownloadInfo
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
-class DownloadViewModel : ViewModel() {
+class DownloadViewModel(private val data: DownloadDao, app: Application) : AndroidViewModel(app) {
     // TODO: Implement the ViewModel
-    private val downloadList = mutableListOf<DownloadInfo>()
+     val downloadList = data.getAllCrypto()
 
-    fun addDownloadInfo(info: DownloadInfo, onUpdate: (List<DownloadInfo>) -> Unit) {
-        downloadList.add(info)
-        onUpdate(downloadList)
+    fun addDownloadInfo(info: DownloadInfo) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                data.insert(info)
+            }
+        }
     }
 
     fun removeDownloadInfo(info: DownloadInfo) {
-        downloadList.remove(info)
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                data.delete(info)
+            }
+        }
     }
 
-    fun getNames(): Array<String> {
+    fun getNames(): Array<String> = downloadList.value?.let {
         val a = arrayListOf<String>()
-        for (i in downloadList)
+        for (i in it)
             a.add(i.name)
+        a.toTypedArray()
+    } ?: arrayOf()
 
-        return a.toTypedArray()
-    }
 }
 
+class DownloadViewModelFactory(private val data: DownloadDao, private val app: Application) :
+    ViewModelProvider.Factory {
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(DownloadViewModel::class.java))
+            return DownloadViewModel(data, app) as T
+        throw IllegalArgumentException("Unable to construct viewmodel")
+    }
+}

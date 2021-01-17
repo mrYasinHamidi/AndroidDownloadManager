@@ -7,13 +7,13 @@
 
         <variable
             name="viewModel"
-            type="com.example.androiddownloadmanager.request.RequestViewModel" />
+            type="com.example.androiddownloadmanager.viewmodels.RequestViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".request.RequestFragment">
+        tools:context=".fragments.RequestFragment">
 
 
         <com.google.android.material.textfield.TextInputLayout
@@ -34,7 +34,7 @@
             app:startIconCheckable="true"
             app:startIconDrawable="@drawable/ic_round_content_paste_24">
 
-            <com.example.androiddownloadmanager.utility.PastedEditText
+            <com.example.androiddownloadmanager.customViews.PastedEditText
                 android:id="@+id/input_url"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

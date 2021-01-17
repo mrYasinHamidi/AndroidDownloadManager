@@ -1,4 +1,4 @@
-package com.example.androiddownloadmanager.downloader
+package com.example.androiddownloadmanager.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -8,8 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.androiddownloadmanager.database.DownloadInfo
 import com.example.androiddownloadmanager.DownloadState
 import com.example.androiddownloadmanager.databinding.DownloadListItemBinding
-import com.example.androiddownloadmanager.utility.getStateFromDb
-import com.example.androiddownloadmanager.utility.setStateToDb
+import com.example.androiddownloadmanager.getStateFromDb
 
 class DownloadAdapter : ListAdapter<DownloadInfo, DownloadViewHolder>(DownloadUtil()) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DownloadViewHolder {
@@ -24,13 +23,9 @@ class DownloadAdapter : ListAdapter<DownloadInfo, DownloadViewHolder>(DownloadUt
 class DownloadViewHolder(private val binding: DownloadListItemBinding) :
     RecyclerView.ViewHolder(binding.root) {
     fun bind(info: DownloadInfo) {
-        binding.info = info
+//        binding.info = info
         binding.executePendingBindings()
         binding.downloadView.setDownloadInformation(info)
-        if (getStateFromDb(info.state) == DownloadState.NONE)
-            binding.downloadView.start()
-
-
     }
 
     companion object {

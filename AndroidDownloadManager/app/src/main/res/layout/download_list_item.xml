@@ -15,7 +15,7 @@
         android:layout_margin="4dp">
 
 
-        <com.example.androiddownloadmanager.downloader.DownloadView
+        <com.example.androiddownloadmanager.customViews.DownloadView
             android:id="@+id/download_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

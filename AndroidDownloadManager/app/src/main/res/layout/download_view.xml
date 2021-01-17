@@ -32,7 +32,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/circleProgress" />
 
-            <com.example.androiddownloadmanager.utility.CircleProgress
+            <com.example.androiddownloadmanager.customViews.CircleProgress
                 android:id="@+id/circleProgress"
                 android:layout_width="70dp"
                 android:layout_height="70dp"

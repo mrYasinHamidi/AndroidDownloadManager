@@ -1,4 +1,4 @@
-package com.example.androiddownloadmanager.utility;
+package com.example.androiddownloadmanager.customViews;
 
 import android.animation.ObjectAnimator;
 import android.content.Context;

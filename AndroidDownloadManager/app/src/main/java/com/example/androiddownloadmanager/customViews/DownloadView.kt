@@ -1,4 +1,4 @@
-package com.example.androiddownloadmanager.downloader
+package com.example.androiddownloadmanager.customViews
 
 import android.content.Context
 import android.util.AttributeSet
@@ -10,10 +10,10 @@ import com.example.androiddownloadmanager.database.DownloadInfo
 import com.example.androiddownloadmanager.DownloadState
 import com.example.androiddownloadmanager.R
 import com.example.androiddownloadmanager.databinding.DownloadViewBinding
-import com.example.androiddownloadmanager.utility.getSize
-import com.example.androiddownloadmanager.utility.OnStateChange
-import com.example.androiddownloadmanager.utility.getStateFromDb
-import com.example.androiddownloadmanager.utility.setStateToDb
+import com.example.androiddownloadmanager.getSize
+import com.example.androiddownloadmanager.OnStateChange
+import com.example.androiddownloadmanager.getStateFromDb
+import com.example.androiddownloadmanager.setStateToDb
 import java.io.File
 
 class DownloadView : LinearLayout {
@@ -64,7 +64,6 @@ class DownloadView : LinearLayout {
                     binding.circleProgress.progress = 100
                 DownloadState.NONE ->
                     binding.circleProgress.progress = 0
-
             }
         }
     }

@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/downloadFragment"
-        android:name="com.example.androiddownloadmanager.downloader.DownloadFragment"
+        android:name="com.example.androiddownloadmanager.fragments.DownloadFragment"
         android:label="download_fragment"
         tools:layout="@layout/download_fragment" >
         <action
@@ -16,7 +16,7 @@
     </fragment>
     <dialog
         android:id="@+id/requestFragment"
-        android:name="com.example.androiddownloadmanager.request.RequestFragment"
+        android:name="com.example.androiddownloadmanager.fragments.RequestFragment"
         android:label="request_fragment"
         tools:layout="@layout/request_fragment" >
         <argument

@@ -11,13 +11,11 @@ import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
+import com.example.androiddownloadmanager.*
 import com.example.androiddownloadmanager.database.DownloadInfo
-import com.example.androiddownloadmanager.DownloadState
-import com.example.androiddownloadmanager.R
 import com.example.androiddownloadmanager.adapters.DownloadAdapter
 import com.example.androiddownloadmanager.database.getDatabase
 import com.example.androiddownloadmanager.databinding.DownloadFragmentBinding
-import com.example.androiddownloadmanager.setStateToDb
 import com.example.androiddownloadmanager.customViews.DownloadView
 import com.example.androiddownloadmanager.factories.DownloadViewModelFactory
 import com.example.androiddownloadmanager.viewmodels.DownloadViewModel
@@ -54,13 +52,28 @@ class DownloadFragment : Fragment() {
             then set a DownloadView for each of them
             (just in start of app)
             */
-            for (i in it)
+            for (i in it) {
                 binding.contentLayout.addView(i, 0)
+                if (i.info!!.state != setStateToDb(DownloadState.SUCCESSFUL))
+                    i.setOnStateChangeListener(object : OnStateChange {
+                        override fun onUpdate(state: DownloadState) {
+                            viewModel.update(i.info!!)
+                            Log.i("aaa","$i : $state")
+                        }
+                    })
+            }
         })
         viewModel.newView.observe(viewLifecycleOwner, Observer {
             //every time that user insert a new url
             binding.contentLayout.addView(it, 0)
+            it.setOnStateChangeListener(object : OnStateChange {
+                override fun onUpdate(state: DownloadState) {
+                    Log.i("aaa","$it : $state")
+                    viewModel.update(it.info!!)
+                }
+            })
         })
+
 
 
         return binding.root

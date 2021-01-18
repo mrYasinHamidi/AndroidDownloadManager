@@ -11,5 +11,6 @@ data class DownloadInfo(
     val url: String,
     val path: String,
     val size: Long,
-    var state: Int
+    var state: Int,
+    var dId: Int? = null
 )

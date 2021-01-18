@@ -75,6 +75,14 @@ class DownloadViewModel(
         a.toTypedArray()
     } ?: arrayOf()
 
+    fun update(info: DownloadInfo) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                data.update(info)
+            }
+        }
+    }
+
 
 }
 

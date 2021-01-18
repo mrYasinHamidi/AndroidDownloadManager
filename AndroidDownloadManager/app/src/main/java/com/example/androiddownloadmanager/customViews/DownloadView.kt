@@ -2,10 +2,14 @@ package com.example.androiddownloadmanager.customViews
 
 import android.content.Context
 import android.util.AttributeSet
+import android.util.Log
 import android.view.LayoutInflater
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
+import com.downloader.Error
+import com.downloader.OnDownloadListener
+import com.downloader.PRDownloader
 import com.example.androiddownloadmanager.database.DownloadInfo
 import com.example.androiddownloadmanager.DownloadState
 import com.example.androiddownloadmanager.R
@@ -40,12 +44,25 @@ class DownloadView : LinearLayout {
         this,
         true
     )
-    private var info: DownloadInfo? = null
-
+    var info: DownloadInfo? = null
     fun setDownloadInformation(info: DownloadInfo) {
         if (this.info == null) {
             this.info = info
             setup()
+        }
+    }
+
+    init {
+        binding.circleProgress.setOnClickListener {
+            info?.let {
+                when (getStateFromDb(it.state)) {
+                    DownloadState.NONE -> start()
+                    DownloadState.RUNNING -> stop()
+                    DownloadState.STOP -> resume()
+                    DownloadState.ERROR -> start()
+
+                }
+            }
         }
     }
 
@@ -71,18 +88,47 @@ class DownloadView : LinearLayout {
 
     fun start() {
         info?.let {
-            it.state = setStateToDb(DownloadState.RUNNING)
-            download()
+            it.dId = download()
         }
     }
 
-    private fun download() {
-        Toast.makeText(context, "${info?.name} is downloading ...", Toast.LENGTH_SHORT).show()
+    private fun download(): Int {
+        val a = PRDownloader.download(info!!.url, info!!.path, info!!.name)
+            .build()
+            .setOnStartOrResumeListener { updateState(DownloadState.RUNNING) }
+            .setOnPauseListener { updateState(DownloadState.STOP) }
+            .setOnCancelListener { updateState(DownloadState.NONE) }
+            .setOnProgressListener {
+                binding.circleProgress.progress =
+                    (it.currentBytes * 100 / it.totalBytes).toInt()
+            }
+            .start(object : OnDownloadListener {
+                override fun onDownloadComplete() {
+                    updateState(DownloadState.SUCCESSFUL)
+                    Toast.makeText(context, "complate", Toast.LENGTH_SHORT).show()
+                }
+
+                override fun onError(error: Error?) {
+                    updateState(DownloadState.ERROR)
+                    Toast.makeText(context, "${error?.serverErrorMessage}", Toast.LENGTH_LONG)
+                        .show()
+                    info?.dId = null
+                }
+            })
+        return a
+
     }
 
-    fun stop() {
-        info?.let {
-            updateState(DownloadState.STOP)
+    private fun stop() {
+        info?.dId?.let {
+            PRDownloader.pause(it)
+        }
+    }
+
+    private fun resume() {
+        info?.dId?.let {
+            Log.i("aaa",PRDownloader.getStatus(info!!.dId!!).toString())
+            PRDownloader.resume(it)
         }
     }
 
@@ -95,7 +141,7 @@ class DownloadView : LinearLayout {
     }
 
 
-    fun setOnStateChangeListener(onChange: OnStateChange){
+    fun setOnStateChangeListener(onChange: OnStateChange) {
         onChangeListeners.add(onChange)
     }
 

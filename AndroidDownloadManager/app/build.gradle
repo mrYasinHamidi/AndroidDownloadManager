@@ -64,5 +64,6 @@ dependencies {
     kapt "androidx.room:room-compiler:$room_version"
     //material design
     implementation 'com.google.android.material:material:1.2.1'
-
+    //Downloader
+    implementation 'com.mindorks.android:prdownloader:0.6.0'
 }

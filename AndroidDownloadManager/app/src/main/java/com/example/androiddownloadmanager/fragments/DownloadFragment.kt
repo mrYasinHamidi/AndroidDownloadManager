@@ -2,6 +2,7 @@ package com.example.androiddownloadmanager.fragments
 
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -25,7 +26,7 @@ class DownloadFragment : Fragment() {
 
     private lateinit var binding: DownloadFragmentBinding
     private lateinit var viewModel: DownloadViewModel
-    private lateinit var adapter: DownloadAdapter
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -39,9 +40,6 @@ class DownloadFragment : Fragment() {
         //initialize view model
         viewModel = createViewModel()
 
-        //setup recycler view
-        adapter = DownloadAdapter()
-        binding.recyclerView.adapter = adapter
 
         //set an on click listener for add button
         binding.addFloatingButton.setOnClickListener {
@@ -50,25 +48,39 @@ class DownloadFragment : Fragment() {
             findNavController().navigate(action)
         }
 
-        //get the list of download an show it in recycler view
-        viewModel.downloadList.observe(viewLifecycleOwner, Observer {
-            adapter.submitList(it)
+        //do observe , observable object of view model
+        viewModel.views.observe(viewLifecycleOwner, Observer {
+            /*observe for data in database (DownloadInfo.kt)
+            then set a DownloadView for each of them
+            (just in start of app)
+            */
+            for (i in it)
+                binding.contentLayout.addView(i, 0)
         })
+        viewModel.newView.observe(viewLifecycleOwner, Observer {
+            //every time that user insert a new url
+            binding.contentLayout.addView(it, 0)
+        })
+
 
         return binding.root
     }
 
     private fun createViewModel(): DownloadViewModel {
         val application = requireActivity().application
-        val factory = DownloadViewModelFactory(getDatabase(application).dao,application)
-        val vm = ViewModelProvider(this,factory).get(DownloadViewModel::class.java)
-        binding.viewModel = vm
+        val factory = DownloadViewModelFactory(getDatabase(application).dao, context, application)
+        val vm = ViewModelProvider(this, factory).get(DownloadViewModel::class.java)
         binding.lifecycleOwner = this
         return vm
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        /*every time that user insert a download url in RequestFragment.kt
+        * we will be noticed in this section
+        * then we create a DownloadInfo with that information and pass it to view model */
+
         super.onViewCreated(view, savedInstanceState)
+
         findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<Map<String, String>>(
             "request"
         )
@@ -82,7 +94,7 @@ class DownloadFragment : Fragment() {
                         size = (it["size"] ?: "").toLong(),
                         state = setStateToDb(DownloadState.NONE)
                     )
-                    viewModel.addDownloadInfo(info)
+                    viewModel.addDownloadInfo(info) //pass DownloadInformation to view model
                 })
     }
 

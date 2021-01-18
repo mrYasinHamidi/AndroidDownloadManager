@@ -99,4 +99,8 @@ class DownloadView : LinearLayout {
         onChangeListeners.add(onChange)
     }
 
+    override fun toString(): String {
+        return info?.name ?: "null"
+    }
+
 }

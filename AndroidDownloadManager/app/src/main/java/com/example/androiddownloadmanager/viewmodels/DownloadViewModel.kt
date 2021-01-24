@@ -3,6 +3,7 @@ package com.example.androiddownloadmanager.viewmodels
 import android.app.Application
 import android.content.Context
 import android.util.Log
+import android.view.View
 import androidx.lifecycle.*
 import com.example.androiddownloadmanager.customViews.DownloadView
 import com.example.androiddownloadmanager.database.DownloadDao
@@ -79,6 +80,17 @@ class DownloadViewModel(
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 data.update(info)
+            }
+        }
+    }
+
+    fun delete(view: DownloadView) {
+        views.value?.remove(view)
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                view.info?.let {
+                    data.delete(it)
+                }
             }
         }
     }

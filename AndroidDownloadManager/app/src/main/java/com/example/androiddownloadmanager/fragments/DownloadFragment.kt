@@ -1,5 +1,7 @@
 package com.example.androiddownloadmanager.fragments
 
+import android.app.AlertDialog
+import android.content.DialogInterface
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
 import android.util.Log
@@ -54,11 +56,11 @@ class DownloadFragment : Fragment() {
             */
             for (i in it) {
                 binding.contentLayout.addView(i, 0)
+                setDeleteListener(i)
                 if (i.info!!.state != setStateToDb(DownloadState.SUCCESSFUL))
                     i.setOnStateChangeListener(object : OnStateChange {
                         override fun onUpdate(state: DownloadState) {
                             viewModel.update(i.info!!)
-                            Log.i("aaa","$i : $state")
                         }
                     })
             }
@@ -66,9 +68,10 @@ class DownloadFragment : Fragment() {
         viewModel.newView.observe(viewLifecycleOwner, Observer {
             //every time that user insert a new url
             binding.contentLayout.addView(it, 0)
+            //setOnLongClickListener
+            setDeleteListener(it)
             it.setOnStateChangeListener(object : OnStateChange {
                 override fun onUpdate(state: DownloadState) {
-                    Log.i("aaa","$it : $state")
                     viewModel.update(it.info!!)
                 }
             })
@@ -77,6 +80,22 @@ class DownloadFragment : Fragment() {
 
 
         return binding.root
+    }
+
+    private fun setDeleteListener(i: DownloadView) {
+        i.setOnLongClickListener {
+            AlertDialog.Builder(context)
+                .setMessage("Are You Sure That Delete This Item ?")
+                .setTitle("Deleting ${i.info?.name} item !!!")
+                .setPositiveButton("Yes", { dialog, which ->
+                    i.delete()
+                    viewModel.delete(i)
+                    binding.contentLayout
+                }).setNegativeButton("No", { dialog, wich ->
+                    dialog.dismiss()
+                })
+            true
+        }
     }
 
     private fun createViewModel(): DownloadViewModel {

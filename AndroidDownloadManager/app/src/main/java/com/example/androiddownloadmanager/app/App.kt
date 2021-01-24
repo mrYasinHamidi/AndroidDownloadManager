@@ -3,6 +3,7 @@ package com.example.androiddownloadmanager.app
 import android.app.Application
 import com.downloader.PRDownloader
 import com.downloader.PRDownloaderConfig
+import com.tonyodev.fetch2.FetchConfiguration
 
 class App:Application() {
     override fun onCreate() {
@@ -13,5 +14,6 @@ class App:Application() {
             .setConnectTimeout(30_000)
             .build()
         PRDownloader.initialize(applicationContext,config)
+
     }
 }

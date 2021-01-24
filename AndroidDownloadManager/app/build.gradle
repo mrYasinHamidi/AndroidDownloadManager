@@ -66,4 +66,5 @@ dependencies {
     implementation 'com.google.android.material:material:1.2.1'
     //Downloader
     implementation 'com.mindorks.android:prdownloader:0.6.0'
+    implementation "androidx.tonyodev.fetch2:xfetch2:3.1.6"
 }

@@ -12,7 +12,7 @@ fun getClipBoardText(context: Context): String =
     (context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager).text.toString()
 
 enum class DownloadState {
-    NONE, RUNNING, SUCCESSFUL, ERROR, STOP
+    INIT, RUNNING, SUCCESSFUL, ERROR, STOP
 }
 
 enum class RequestState() {
@@ -50,16 +50,16 @@ fun Double.format(digits: Int) = "%.${digits}f".format(this)
 fun Float.format(digits: Int) = "%.${digits}f".format(this)
 
 fun getStateFromDb(state: Int) = when (state) {
-    0 -> DownloadState.NONE
+    0 -> DownloadState.INIT
     1 -> DownloadState.RUNNING
     2 -> DownloadState.SUCCESSFUL
     3 -> DownloadState.ERROR
     4 -> DownloadState.STOP
-    else -> DownloadState.NONE
+    else -> DownloadState.INIT
 }
 
 fun setStateToDb(state: DownloadState) = when (state) {
-    DownloadState.NONE -> 0
+    DownloadState.INIT -> 0
     DownloadState.RUNNING -> 1
     DownloadState.SUCCESSFUL -> 2
     DownloadState.ERROR -> 3

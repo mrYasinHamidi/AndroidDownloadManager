@@ -2,19 +2,16 @@ package com.example.androiddownloadmanager.customViews
 
 import android.content.Context
 import android.util.AttributeSet
-import android.util.Log
 import android.view.LayoutInflater
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
-import com.downloader.PRDownloader
 import com.example.androiddownloadmanager.*
 import com.example.androiddownloadmanager.R
 import com.example.androiddownloadmanager.database.DownloadInfo
 import com.example.androiddownloadmanager.databinding.DownloadViewBinding
 import com.tonyodev.fetch2.*
 import com.tonyodev.fetch2core.DownloadBlock
-import com.tonyodev.fetch2core.Func
 import java.io.File
 
 class DownloadView : LinearLayout {
@@ -70,22 +67,22 @@ class DownloadView : LinearLayout {
             binding.dlTxtSize.text = getSize(it.size)
             binding.dlTxtSpeed.text = ""
             binding.dlTxtTime.text = ""
-            when (getStateFromDb(it.state)) {
+            when (it.state) {
                 DownloadState.STOP -> binding.circleProgress.progress =
                     (File(it.path).length() / it.size * 100).toInt()
                 DownloadState.ERROR -> binding.circleProgress.progress =
                     (File(it.path).length() / it.size * 100).toInt()
                 DownloadState.SUCCESSFUL ->
                     binding.circleProgress.progress = 100
-                DownloadState.NONE ->
+                DownloadState.INIT ->
                     binding.circleProgress.progress = 0
             }
 
 
             //on click for interact with user
             binding.circleProgress.setOnClickListener { _ ->
-                when (getStateFromDb(it.state)) {
-                    DownloadState.NONE -> start()
+                when (it.state) {
+                    DownloadState.INIT -> start()
                     DownloadState.RUNNING -> stop()
                     DownloadState.STOP -> resume()
                     DownloadState.ERROR -> start()
@@ -197,7 +194,7 @@ class DownloadView : LinearLayout {
 
     private fun updateState(state: DownloadState) {
         info?.let {
-            it.state = setStateToDb(state)
+            it.state = state
             for (i in onChangeListeners)
                 i.onUpdate(state)
         }

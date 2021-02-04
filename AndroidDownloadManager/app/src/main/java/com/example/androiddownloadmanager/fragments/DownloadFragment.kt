@@ -1,7 +1,5 @@
 package com.example.androiddownloadmanager.fragments
 
-import android.app.AlertDialog
-import android.content.DialogInterface
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
 import android.util.Log
@@ -9,23 +7,27 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.example.androiddownloadmanager.*
-import com.example.androiddownloadmanager.database.DownloadInfo
 import com.example.androiddownloadmanager.adapters.DownloadAdapter
+import com.example.androiddownloadmanager.adapters.InfoUpdate
+import com.example.androiddownloadmanager.database.DownloadInfo
 import com.example.androiddownloadmanager.database.getDatabase
 import com.example.androiddownloadmanager.databinding.DownloadFragmentBinding
 import com.example.androiddownloadmanager.customViews.DownloadView
 import com.example.androiddownloadmanager.factories.DownloadViewModelFactory
 import com.example.androiddownloadmanager.viewmodels.DownloadViewModel
+import com.tonyodev.fetch2.Fetch
+import com.tonyodev.fetch2.FetchConfiguration
 
 class DownloadFragment : Fragment() {
 
     private lateinit var binding: DownloadFragmentBinding
     private lateinit var viewModel: DownloadViewModel
+    private lateinit var adapter : DownloadAdapter
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -40,6 +42,25 @@ class DownloadFragment : Fragment() {
         //initialize view model
         viewModel = createViewModel()
 
+        //create a Downloader
+        val fetchConfig = FetchConfiguration.Builder(requireContext())
+            .setDownloadConcurrentLimit(3)
+            .build()
+        val fetch = Fetch.Impl.getInstance(fetchConfig)
+        val downloader = Downloader(fetch)
+
+        //initialize RecyclerView
+        adapter = DownloadAdapter(downloader, InfoUpdate {
+            viewModel.update(it)
+        })
+        binding.recyclerview.adapter = adapter
+
+        //do observe , observable object of view model
+        viewModel.infos.observe(viewLifecycleOwner, Observer {
+            adapter.submitList(it)
+            Log.i("aaa","items Submited")
+        })
+
 
         //set an on click listener for add button
         binding.addFloatingButton.setOnClickListener {
@@ -48,55 +69,10 @@ class DownloadFragment : Fragment() {
             findNavController().navigate(action)
         }
 
-        //do observe , observable object of view model
-        viewModel.views.observe(viewLifecycleOwner, Observer {
-            /*observe for data in database (DownloadInfo.kt)
-            then set a DownloadView for each of them
-            (just in start of app)
-            */
-            for (i in it) {
-                binding.contentLayout.addView(i, 0)
-                setDeleteListener(i)
-                if (i.info!!.state != setStateToDb(DownloadState.SUCCESSFUL))
-                    i.setOnStateChangeListener(object : OnStateChange {
-                        override fun onUpdate(state: DownloadState) {
-                            viewModel.update(i.info!!)
-                        }
-                    })
-            }
-        })
-        viewModel.newView.observe(viewLifecycleOwner, Observer {
-            //every time that user insert a new url
-            binding.contentLayout.addView(it, 0)
-            //setOnLongClickListener
-            setDeleteListener(it)
-            it.setOnStateChangeListener(object : OnStateChange {
-                override fun onUpdate(state: DownloadState) {
-                    viewModel.update(it.info!!)
-                }
-            })
-        })
-
-
 
         return binding.root
     }
 
-    private fun setDeleteListener(i: DownloadView) {
-        i.setOnLongClickListener {
-            AlertDialog.Builder(context)
-                .setMessage("Are You Sure That Delete This Item ?")
-                .setTitle("Deleting ${i.info?.name} item !!!")
-                .setPositiveButton("Yes", { dialog, which ->
-                    i.delete()
-                    viewModel.delete(i)
-                    binding.contentLayout
-                }).setNegativeButton("No", { dialog, wich ->
-                    dialog.dismiss()
-                })
-            true
-        }
-    }
 
     private fun createViewModel(): DownloadViewModel {
         val application = requireActivity().application
@@ -124,9 +100,9 @@ class DownloadFragment : Fragment() {
                         url = it["url"] ?: "",
                         path = it["path"] ?: "",
                         size = (it["size"] ?: "").toLong(),
-                        state = setStateToDb(DownloadState.NONE)
+                        state = DownloadState.INIT
                     )
-                    viewModel.addDownloadInfo(info) //pass DownloadInformation to view model
+                    viewModel.insert(info) //pass DownloadInformation to view model
                 })
     }
 

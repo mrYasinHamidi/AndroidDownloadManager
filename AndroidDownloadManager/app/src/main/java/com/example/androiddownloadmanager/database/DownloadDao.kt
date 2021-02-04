@@ -6,7 +6,7 @@ import androidx.room.*
 @Dao
 interface DownloadDao {
     @Query("SELECT * FROM DownloadInfo")
-    fun getAllCrypto(): List<DownloadInfo>
+    fun getAllCrypto(): LiveData<List<DownloadInfo>>
 
     @Insert
     fun insert(info: DownloadInfo)

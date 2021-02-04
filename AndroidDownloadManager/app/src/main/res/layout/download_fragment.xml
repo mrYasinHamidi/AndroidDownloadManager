@@ -12,15 +12,11 @@
         android:layout_height="match_parent"
         tools:context=".fragments.DownloadFragment">
 
-        <ScrollView
+        <androidx.recyclerview.widget.RecyclerView
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:id="@+id/content_layout"/>
-        </ScrollView>
+            android:layout_height="match_parent"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            android:id="@+id/recyclerview"/>
 
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton

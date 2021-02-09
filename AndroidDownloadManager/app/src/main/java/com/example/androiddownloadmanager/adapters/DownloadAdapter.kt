@@ -7,44 +7,78 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.androiddownloadmanager.DownloadState
-import com.example.androiddownloadmanager.Downloader
-import com.example.androiddownloadmanager.RecyclerViewCallback
 import com.example.androiddownloadmanager.database.DownloadInfo
 import com.example.androiddownloadmanager.databinding.DownloadListItemBinding
-import com.example.androiddownloadmanager.getSize
-import com.tonyodev.fetch2.Download
-import com.tonyodev.fetch2.Error
-import com.tonyodev.fetch2core.DownloadBlock
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.core.Observer
+import io.reactivex.rxjava3.disposables.Disposable
 
-class DownloadAdapter(private val downloader: Downloader, private val infoUpdate: InfoUpdate) :
+class DownloadAdapter(
+    private val downloadObservable: Observable<String>,
+    private val listCallBack: ListCallBack
+) :
     ListAdapter<DownloadInfo, DownloadViewHolder>(DownloadUtil()) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DownloadViewHolder {
         return DownloadViewHolder.from(parent)
     }
 
     override fun onBindViewHolder(holder: DownloadViewHolder, position: Int) {
-        holder.bind(getItem(position), downloader, infoUpdate)
-        Log.i("aaa","item bind position : $position")
+        holder.bind(getItem(position), downloadObservable, listCallBack)
     }
 }
 
 class DownloadViewHolder(private val binding: DownloadListItemBinding) :
     RecyclerView.ViewHolder(binding.root) {
-    fun bind(info: DownloadInfo, downloader: Downloader, infoUpdate: InfoUpdate) {
+    fun bind(info: DownloadInfo, downloadObservable: Observable<String>, listener: ListCallBack) {
         binding.executePendingBindings()
 
         binding.circleProgress.setOnClickListener {
-            when(info.state){
-                DownloadState.INIT -> {
-                    info.dId = downloader.start(info)
-                    infoUpdate.onUpdate(info)
-                }
-                DownloadState.RUNNING -> downloader.pause(info)
-                DownloadState.STOP -> downloader.resume(info)
-                DownloadState.ERROR -> downloader.retry(info)
-            }
+            listener.clickInfo(info)
         }
-        addListiner(info, downloader, infoUpdate)
+
+        downloadObservable.subscribe(object : Observer<String> {
+            override fun onSubscribe(d: Disposable?) {
+            }
+
+            override fun onNext(t: String?) {
+                Log.i("Observable","On_Next : $t")
+                val objects: List<String> = t?.split(',') ?: listOf("")
+                if (objects[1].toInt() == info.dId)
+                    when (objects[0]) {
+                        "onStarted" -> {
+                            info.state = DownloadState.RUNNING
+                            listener.updateInfo(info)
+                        }
+                        "onResumed" -> {
+                            info.state = DownloadState.RUNNING
+                            listener.updateInfo(info)
+                        }
+                        "onProgress" -> {
+                            binding.circleProgress.progress = objects[2].toInt()
+                        }
+                        "onPaused" -> {
+                            info.state = DownloadState.STOP
+                            listener.updateInfo(info)
+                        }
+                        "onError" -> {
+                            info.state = DownloadState.ERROR
+                            listener.updateInfo(info)
+                        }
+                        "onCompleted" -> {
+                            info.state = DownloadState.SUCCESSFUL
+                            listener.updateInfo(info)
+                        }
+                    }
+            }
+
+            override fun onError(e: Throwable?) {
+            }
+
+            override fun onComplete() {
+                Log.i("Observable","OnComplete : ${info.dId}")
+            }
+        })
+
     }
 
 
@@ -61,81 +95,6 @@ class DownloadViewHolder(private val binding: DownloadListItemBinding) :
 
     }
 
-    private fun addListiner(info: DownloadInfo, downloader: Downloader, infoUpdate: InfoUpdate) {
-        info.dId?.let {
-            downloader.addListiner(it, object : RecyclerViewCallback {
-                override fun onAdded(download: Download) {
-                    binding.dlTxtName.text = "Initializing"
-                }
-
-                override fun onQueued(download: Download, waitingOnNetwork: Boolean) {
-
-                }
-
-                override fun onWaitingNetwork(download: Download) {
-                    binding.dlTxtName.text = "Waiting for network"
-                }
-
-                override fun onCompleted(download: Download) {
-                    info.state = DownloadState.SUCCESSFUL
-                    infoUpdate.onUpdate(info)
-                }
-
-                override fun onError(download: Download, error: Error, throwable: Throwable?) {
-                    info.state = DownloadState.ERROR
-                    infoUpdate.onUpdate(info)
-                }
-
-                override fun onDownloadBlockUpdated(
-                    download: Download,
-                    downloadBlock: DownloadBlock,
-                    totalBlocks: Int
-                ) {
-                    Log.i("aaa","downloadBlock : $downloadBlock \t totalBlock : $totalBlocks")
-                }
-
-                override fun onStarted(
-                    download: Download,
-                    downloadBlocks: List<DownloadBlock>,
-                    totalBlocks: Int
-                ) {
-                    binding.dlTxtName.text = info.name
-                    info.state = DownloadState.RUNNING
-                    infoUpdate.onUpdate(info)
-                }
-
-                override fun onProgress(
-                    download: Download,
-                    etaInMilliSeconds: Long,
-                    downloadedBytesPerSecond: Long
-                ) {
-                    binding.circleProgress.progress = download.progress
-                    binding.dlTxtSpeed.text = getSize(downloadedBytesPerSecond)
-                    binding.dlTxtTime.text = (etaInMilliSeconds / 1000).toString()
-                }
-
-                override fun onPaused(download: Download) {
-                    info.state = DownloadState.STOP
-                    infoUpdate.onUpdate(info)
-                }
-
-                override fun onResumed(download: Download) {
-                    info.state = DownloadState.RUNNING
-                    infoUpdate.onUpdate(info)
-                }
-
-                override fun onCancelled(download: Download) {
-                }
-
-                override fun onRemoved(download: Download) {
-                }
-
-                override fun onDeleted(download: Download) {
-
-                }
-            })
-        }
-    }
 }
 
 class DownloadUtil : DiffUtil.ItemCallback<DownloadInfo>() {
@@ -148,8 +107,9 @@ class DownloadUtil : DiffUtil.ItemCallback<DownloadInfo>() {
     }
 }
 
-class InfoUpdate(private val listiner: (DownloadInfo) -> Unit) {
-    fun onUpdate(info: DownloadInfo) = listiner(info)
+class ListCallBack(private val onUpdate: (DownloadInfo) -> Unit, private val onClick: (DownloadInfo) -> Unit) {
+    fun updateInfo(info: DownloadInfo) = onUpdate(info)
+    fun clickInfo(info: DownloadInfo) = onClick(info)
 }
 
 //https://project.yasinhamidi.ir/MafiaApp/mafia.apk

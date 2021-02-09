@@ -1,9 +1,9 @@
 <component name="libraryTable">
   <library name="Gradle: androidx.tonyodev.fetch2core:xfetch2core:3.1.6@aar">
     <CLASSES>
-      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/05ea24ccf24423c7b52c3b98eb25c3aa/jetified-xfetch2core-3.1.6/jars/classes.jar!/" />
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/05ea24ccf24423c7b52c3b98eb25c3aa/jetified-xfetch2core-3.1.6/res" />
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/05ea24ccf24423c7b52c3b98eb25c3aa/jetified-xfetch2core-3.1.6/AndroidManifest.xml" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/599a0884d85d3e17cefad458cea0662c/jetified-xfetch2core-3.1.6/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/599a0884d85d3e17cefad458cea0662c/jetified-xfetch2core-3.1.6/res" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/599a0884d85d3e17cefad458cea0662c/jetified-xfetch2core-3.1.6/AndroidManifest.xml" />
     </CLASSES>
     <JAVADOC>
       <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/androidx.tonyodev.fetch2core/xfetch2core/3.1.6/f1658974a9828cb6749274874dbdf9fc6c371ecb/xfetch2core-3.1.6-javadoc.jar!/" />

@@ -119,13 +119,14 @@ class RequestFragment : DialogFragment() {
     }
 
     private fun submit() {
-        val args: RequestFragmentArgs by navArgs()
+//        val args: RequestFragmentArgs by navArgs()
         val name =
             if (binding.inputName.text.isEmpty()) "${viewModel.name.value}" else "${binding.inputName.text.toString()
                 .trim()}.${binding.inputUrl.text.toString().split(".").last()}"
-        if (args.names.contains(name)) {
-            Toast.makeText(context, "this name is already used", Toast.LENGTH_SHORT).show()
-        } else {
+
+//        if (args.names.contains(name)) {
+//            Toast.makeText(context, "this name is already used", Toast.LENGTH_SHORT).show()
+//        } else {
             findNavController().previousBackStackEntry?.savedStateHandle?.set(
                 "request",
                 mapOf<String, String>(
@@ -138,7 +139,7 @@ class RequestFragment : DialogFragment() {
                 )
             )
             findNavController().navigateUp()
-        }
+//        }
     }
 
 }

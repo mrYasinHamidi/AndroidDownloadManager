@@ -13,7 +13,10 @@ data class DownloadInfo(
     val path: String,
     val size: Long,
     var state: DownloadState,
-    var dId: Int? = null
+    var dId: Int? = null,
+    var progress: Int = 0,
+    var timer: String = "",
+    var speed: String = ""
 )
 
 class Converters {

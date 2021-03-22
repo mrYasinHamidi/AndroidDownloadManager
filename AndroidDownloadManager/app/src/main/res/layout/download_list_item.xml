@@ -4,6 +4,9 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <data>
+        <variable
+            name="info"
+            type="com.example.androiddownloadmanager.database.DownloadInfo" />
     </data>
 
     <com.google.android.material.card.MaterialCardView
@@ -26,7 +29,7 @@
                 android:layout_marginEnd="4dp"
                 android:maxLines="2"
                 android:minLines="2"
-                android:text="kfjakdfja;dkfj;akdfj;akfja;dkfj"
+                android:text="@{info.name}"
                 app:layout_constraintEnd_toStartOf="@+id/circleProgress"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/circleProgress" />
@@ -47,7 +50,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="4dp"
-                android:text="128 MB"
+                setSize="@{info.size}"
                 app:layout_constraintBottom_toBottomOf="@+id/circleProgress"
                 app:layout_constraintHorizontal_chainStyle="spread"
                 app:layout_constraintStart_toStartOf="parent"
@@ -58,7 +61,7 @@
                 android:id="@+id/dl_txt_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="29 : 80"
+                android:text="@{info.timer}"
                 app:layout_constraintBottom_toBottomOf="@+id/dl_txt_size"
                 app:layout_constraintEnd_toStartOf="@+id/dl_txt_speed"
                 app:layout_constraintHorizontal_bias="0.5"
@@ -68,7 +71,7 @@
                 android:id="@+id/dl_txt_speed"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="1.5 m/s"
+                android:text="@{info.speed}"
                 app:layout_constraintBottom_toBottomOf="@+id/dl_txt_size"
                 app:layout_constraintEnd_toStartOf="@+id/circleProgress"
                 app:layout_constraintHorizontal_bias="0.5"

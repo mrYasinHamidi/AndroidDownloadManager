@@ -6,6 +6,7 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import com.example.androiddownloadmanager.RequestState
+import com.example.androiddownloadmanager.getSize
 import com.google.android.material.textfield.TextInputLayout
 
 @BindingAdapter("setVisibilityOfTextViews")
@@ -41,4 +42,8 @@ fun setError(view: TextInputLayout, message: String?) {
 fun clareError(view: TextInputLayout, status: RequestState) {
     if (status != RequestState.ERROR)
         view.error = null
+}
+@BindingAdapter("setSize")
+fun setSize(view: TextView, size:Long) {
+    view.text = getSize(size)
 }

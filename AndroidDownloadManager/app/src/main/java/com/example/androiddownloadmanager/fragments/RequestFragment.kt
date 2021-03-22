@@ -22,12 +22,14 @@ class RequestFragment : DialogFragment() {
 
     private lateinit var binding: RequestFragmentBinding
     private lateinit var viewModel: RequestViewModel
+    val args : RequestFragmentArgs by navArgs()
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = DataBindingUtil.inflate(
             inflater,
             R.layout.request_fragment, container, false
@@ -43,7 +45,8 @@ class RequestFragment : DialogFragment() {
                 checkUrl(text)
             }
         })
-
+        for (i in args.names)
+            Toast.makeText(context, i, Toast.LENGTH_SHORT).show()
         //set a onClick for paste url to input url
         binding.txtInputLayout.setStartIconOnClickListener {
             val pastedText = getClipBoardText(requireContext())
@@ -119,14 +122,12 @@ class RequestFragment : DialogFragment() {
     }
 
     private fun submit() {
-//        val args: RequestFragmentArgs by navArgs()
         val name =
             if (binding.inputName.text.isEmpty()) "${viewModel.name.value}" else "${binding.inputName.text.toString()
                 .trim()}.${binding.inputUrl.text.toString().split(".").last()}"
-
-//        if (args.names.contains(name)) {
-//            Toast.makeText(context, "this name is already used", Toast.LENGTH_SHORT).show()
-//        } else {
+        if (args.names.contains(name)) {
+            Toast.makeText(context, "this name is already used", Toast.LENGTH_SHORT).show()
+        } else {
             findNavController().previousBackStackEntry?.savedStateHandle?.set(
                 "request",
                 mapOf<String, String>(
@@ -139,7 +140,7 @@ class RequestFragment : DialogFragment() {
                 )
             )
             findNavController().navigateUp()
-//        }
+        }
     }
 
 }

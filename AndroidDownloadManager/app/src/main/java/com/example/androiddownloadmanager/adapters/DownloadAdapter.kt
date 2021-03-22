@@ -35,7 +35,7 @@ class DownloadViewHolder(private val binding: DownloadListItemBinding) :
         binding.info = newInfo
         binding.circleProgress.progress = newInfo.progress
 
-        binding.circleProgress.setOnClickListener {
+        binding.listCardView.setOnClickListener {
             when (newInfo.state) {
                 DownloadState.INIT -> {
                     newInfo.dId = downloader.start(newInfo)
